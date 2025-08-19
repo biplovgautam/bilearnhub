@@ -126,15 +126,19 @@ export default function Login() {
     );
   }
 
+  // Decide animation sources (using stable public Lottie URLs from existing util)
+  const animationSrc = isSignUp ? educationAnimations.graduation : educationAnimations.reading;
+  const altAnimationSrc = isSignUp ? educationAnimations.online_learning : educationAnimations.education;
+
   return (
     <>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 pt-16">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left Column - Animation and Info */}
-              <div className="space-y-8">
+            <div className="grid lg:grid-cols-2 gap-12 items-center relative">
+              {/* Animation / Info Column (position swaps when toggling) */}
+              <div className={`space-y-8 transition-all duration-500 ${isSignUp ? 'lg:order-2' : 'lg:order-1'} ${isSignUp ? 'animate-slide-fade' : 'animate-fade-in'}`}> 
                 <div className="text-center lg:text-left">
                   <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                     {isSignUp ? 'Join BiLearnHub' : 'Welcome Back'}
@@ -148,11 +152,18 @@ export default function Login() {
                 </div>
 
                 <div className="flex justify-center">
-                  <LottiePlayer
-                    src={educationAnimations.books}
-                    style={{ height: '400px', width: '400px' }}
-                    className="drop-shadow-lg"
-                  />
+                  <div className="relative group">
+                    <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
+                    {/* Primary animation with manual fallback wrapper */}
+                    <div className="rounded-3xl overflow-hidden">
+                      <LottiePlayer
+                        key={isSignUp ? 'signup-anim' : 'login-anim'}
+                        src={animationSrc}
+                        style={{ height: '380px', width: '380px' }}
+                        className="drop-shadow-xl"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="hidden lg:block text-center space-y-4">
@@ -176,8 +187,8 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Right Column - Auth Form */}
-              <div className="max-w-md mx-auto w-full">
+              {/* Auth Form Column (position swaps) */}
+              <div className={`max-w-md mx-auto w-full transition-all duration-500 ${isSignUp ? 'lg:order-1' : 'lg:order-2'} ${isSignUp ? 'animate-fade-in' : 'animate-slide-fade'}`}> 
                 <div className="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.25)] p-8 border border-gray-200/60 dark:border-gray-700/60 overflow-hidden transition-all duration-500">
                   <div className="pointer-events-none absolute -top-32 -right-24 h-64 w-64 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl" />
                   <div className="pointer-events-none absolute -bottom-32 -left-24 h-64 w-64 bg-gradient-to-tr from-purple-500/10 to-blue-600/10 rounded-full blur-3xl" />
