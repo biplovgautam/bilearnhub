@@ -1,13 +1,20 @@
 'use client';
 
 import React from 'react';
+import { useAuth } from '../hooks/useAuth';
 import Button from './ui/Button';
 import LottiePlayer from './ui/LottiePlayer';
 import { educationAnimations } from '../utils/lottie';
 
 const HeroSection = () => {
+  const { user } = useAuth();
+
   const handleStudentRedirect = () => {
-    window.location.href = '/login';
+    if (user) {
+      window.location.href = '/dashboard';
+    } else {
+      window.location.href = '/login';
+    }
   };
 
   const handleTeacherRedirect = () => {
@@ -66,12 +73,13 @@ const HeroSection = () => {
                 variant="gradient"
                 size="lg"
                 onClick={handleStudentRedirect}
-                className="flex-1 sm:flex-none"
+                className="flex-1 sm:flex-none group overflow-hidden relative"
               >
+                <span className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
                 <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
-                Join as Student
+                {user ? 'Go to Dashboard' : 'Join as Student'}
               </Button>
               
               <Button

@@ -20,7 +20,8 @@ const Input = ({
   
   const inputType = type === 'password' && showPassword ? 'text' : type;
   
-  const baseClasses = 'w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed';
+  // Increased rounding & subtle shadow for elevated, softer UI
+  const baseClasses = 'w-full px-4 py-3 border rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow focus:shadow-md dark:shadow-none';
   
   const stateClasses = error 
     ? 'border-red-500 bg-red-50 dark:bg-red-900/20' 
