@@ -17,7 +17,7 @@ export const ThemeProvider = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Get theme from localStorage or default to light
+    // Get theme from localStorage or default to system preference
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
@@ -33,11 +33,12 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     if (mounted) {
       localStorage.setItem('theme', theme);
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      
+      // Update data-theme attribute on document root
+      document.documentElement.setAttribute('data-theme', theme);
+      
+      // Remove old class-based theme system
+      document.documentElement.classList.remove('dark', 'light');
     }
   }, [theme, mounted]);
 

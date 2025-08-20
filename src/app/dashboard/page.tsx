@@ -30,10 +30,14 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 flex items-center justify-center">
+      <div 
+        className="min-h-screen flex items-center justify-center bg-background"
+      >
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading your dashboard...</p>
+          <div 
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 border-accent"
+          ></div>
+          <p className="text-secondary">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -46,15 +50,21 @@ export default function Dashboard() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 pt-16">
+      <div 
+        className="min-h-screen pt-16 bg-background"
+      >
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-6xl mx-auto">
             {/* Welcome Section */}
             <div className="text-center mb-12">
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              <h1 
+                className="text-4xl lg:text-5xl font-bold mb-4 text-text"
+              >
                 Welcome to Your Dashboard
               </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
+              <p 
+                className="text-xl text-secondary"
+              >
                 Ready to start your learning journey, {user.displayName || user.email?.split('@')[0]}?
               </p>
             </div>
@@ -62,9 +72,18 @@ export default function Dashboard() {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* User Profile Card */}
               <div className="lg:col-span-2">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
+                <div 
+                  className="rounded-2xl shadow-xl p-8 border"
+                  style={{
+                    backgroundColor: 'var(--card-bg)',
+                    borderColor: 'var(--border)'
+                  }}
+                >
                   <div className="flex items-center space-x-6 mb-8">
-                    <div className="h-20 w-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                    <div 
+                      className="h-20 w-20 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: 'var(--accent)' }}
+                    >
                       <span className="text-2xl font-bold text-white">
                         {user.displayName 
                           ? user.displayName.charAt(0).toUpperCase()
@@ -73,11 +92,20 @@ export default function Dashboard() {
                       </span>
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      <h2 
+                        className="text-2xl font-bold"
+                        style={{ color: 'var(--text)' }}
+                      >
                         {user.displayName || 'Student'}
                       </h2>
-                      <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
-                      <span className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm rounded-full mt-2">
+                      <p style={{ color: 'var(--secondary)' }}>{user.email}</p>
+                      <span 
+                        className="inline-block px-3 py-1 text-sm rounded-full mt-2"
+                        style={{
+                          backgroundColor: 'var(--accent)',
+                          color: 'white'
+                        }}
+                      >
                         Student
                       </span>
                     </div>
@@ -85,26 +113,70 @@ export default function Dashboard() {
 
                   {/* Profile Stats */}
                   <div className="grid grid-cols-3 gap-4 mb-8">
-                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">0</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Courses Enrolled</div>
+                    <div 
+                      className="text-center p-4 rounded-lg"
+                      style={{ backgroundColor: 'var(--input-bg)' }}
+                    >
+                      <div 
+                        className="text-2xl font-bold"
+                        style={{ color: 'var(--accent)' }}
+                      >
+                        0
+                      </div>
+                      <div 
+                        className="text-sm"
+                        style={{ color: 'var(--secondary)' }}
+                      >
+                        Courses Enrolled
+                      </div>
                     </div>
-                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">0%</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Progress</div>
+                    <div 
+                      className="text-center p-4 rounded-lg"
+                      style={{ backgroundColor: 'var(--input-bg)' }}
+                    >
+                      <div 
+                        className="text-2xl font-bold"
+                        style={{ color: 'var(--accent)' }}
+                      >
+                        0%
+                      </div>
+                      <div 
+                        className="text-sm"
+                        style={{ color: 'var(--secondary)' }}
+                      >
+                        Progress
+                      </div>
                     </div>
-                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">0</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Certificates</div>
+                    <div 
+                      className="text-center p-4 rounded-lg"
+                      style={{ backgroundColor: 'var(--input-bg)' }}
+                    >
+                      <div 
+                        className="text-2xl font-bold"
+                        style={{ color: 'var(--accent)' }}
+                      >
+                        0
+                      </div>
+                      <div 
+                        className="text-sm"
+                        style={{ color: 'var(--secondary)' }}
+                      >
+                        Certificates
+                      </div>
                     </div>
                   </div>
 
                   {/* Quick Actions */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Quick Actions</h3>
+                    <h3 
+                      className="text-lg font-semibold"
+                      style={{ color: 'var(--text)' }}
+                    >
+                      Quick Actions
+                    </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Button
-                        variant="gradient"
+                        variant="accent"
                         className="justify-start p-4 h-auto"
                         onClick={() => {/* TODO: Navigate to course browse */}}
                       >
@@ -138,8 +210,17 @@ export default function Dashboard() {
               {/* Right Sidebar */}
               <div className="space-y-6">
                 {/* Animation Card */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <div 
+                  className="rounded-2xl shadow-xl p-6 border"
+                  style={{
+                    backgroundColor: 'var(--card-bg)',
+                    borderColor: 'var(--border)'
+                  }}
+                >
+                  <h3 
+                    className="text-lg font-semibold mb-4"
+                    style={{ color: 'var(--text)' }}
+                  >
                     Your Learning Journey
                   </h3>
                   <div className="flex justify-center">
@@ -148,14 +229,26 @@ export default function Dashboard() {
                       style={{ height: '200px', width: '200px' }}
                     />
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-4">
+                  <p 
+                    className="text-sm text-center mt-4"
+                    style={{ color: 'var(--secondary)' }}
+                  >
                     Every expert was once a beginner. Start your journey today!
                   </p>
                 </div>
 
                 {/* Account Actions */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <div 
+                  className="rounded-2xl shadow-xl p-6 border"
+                  style={{
+                    backgroundColor: 'var(--card-bg)',
+                    borderColor: 'var(--border)'
+                  }}
+                >
+                  <h3 
+                    className="text-lg font-semibold mb-4"
+                    style={{ color: 'var(--text)' }}
+                  >
                     Account
                   </h3>
                   <div className="space-y-3">
@@ -182,7 +275,10 @@ export default function Dashboard() {
                       Help & Support
                     </Button>
                     
-                    <hr className="my-4 border-gray-200 dark:border-gray-600" />
+                    <hr 
+                      className="my-4"
+                      style={{ borderColor: 'var(--border)' }}
+                    />
                     
                     <Button
                       variant="danger"
@@ -201,21 +297,42 @@ export default function Dashboard() {
 
             {/* Recent Activity Section */}
             <div className="mt-12">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <div 
+                className="rounded-2xl shadow-xl p-8 border"
+                style={{
+                  backgroundColor: 'var(--card-bg)',
+                  borderColor: 'var(--border)'
+                }}
+              >
+                <h3 
+                  className="text-2xl font-bold mb-6"
+                  style={{ color: 'var(--text)' }}
+                >
                   Recent Activity
                 </h3>
                 <div className="text-center py-12">
-                  <svg className="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg 
+                    className="h-16 w-16 mx-auto mb-4" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                    style={{ color: 'var(--muted)' }}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
-                  <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  <h4 
+                    className="text-lg font-medium mb-2"
+                    style={{ color: 'var(--text)' }}
+                  >
                     No activity yet
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  <p 
+                    className="mb-6"
+                    style={{ color: 'var(--secondary)' }}
+                  >
                     Start exploring courses to see your learning progress here.
                   </p>
-                  <Button variant="gradient">
+                  <Button variant="accent">
                     Explore Courses
                   </Button>
                 </div>

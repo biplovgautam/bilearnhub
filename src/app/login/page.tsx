@@ -1,18 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { getAuthErrorMessage, extractErrorCode } from '../../utils/authErrors';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import LottiePlayer from '../../components/ui/LottiePlayer';
+import DotLottiePlayer from '../../components/ui/DotLottiePlayer';
 import Navbar from '../../components/layout/Navbar';
 import { educationAnimations } from '../../utils/lottie';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [signUpStep, setSignUpStep] = useState(1); // Step 1: Email, Step 2: Password
   const [email, setEmail] = useState('');
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
+  const [emailChecking, setEmailChecking] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,23 +37,98 @@ export default function Login() {
     }
   }, [user, redirecting, router]);
 
+  // Email availability check with debounce
+  const checkEmailAvailability = useCallback(async (email: string) => {
+    if (!email || !email.includes('@')) return;
+    
+    setEmailChecking(true);
+    try {
+      // Simulate API call - replace with actual Firebase check
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // For demo, randomly determine availability (replace with actual logic)
+      const available = !email.includes('taken@');
+      setEmailAvailable(available);
+    } catch (error) {
+      console.error('Email check error:', error);
+      setEmailAvailable(null);
+    } finally {
+      setEmailChecking(false);
+    }
+  }, []);
+
+  // Debounce email checking
+  useEffect(() => {
+    if (!isSignUp || !email) {
+      setEmailAvailable(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      checkEmailAvailability(email);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [email, isSignUp, checkEmailAvailability]);
+
+  // Reset signup step when switching modes
+  useEffect(() => {
+    if (!isSignUp) {
+      setSignUpStep(1);
+      setEmailAvailable(null);
+      setEmailChecking(false);
+    }
+  }, [isSignUp]);
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // For signup, handle step-by-step process
+    if (isSignUp) {
+      if (signUpStep === 1) {
+        // Step 1: Email validation
+        if (!email || !email.includes('@')) {
+          setError('Please enter a valid email address');
+          return;
+        }
+        if (emailAvailable === false) {
+          setError('This email is already registered');
+          return;
+        }
+        if (emailAvailable === null) {
+          setError('Please wait for email verification');
+          return;
+        }
+        // Move to step 2
+        setSignUpStep(2);
+        return;
+      }
+
+      if (signUpStep === 2) {
+        // Step 2: Password validation and signup
+        if (!password || !confirmPassword) {
+          setError('Please fill in all password fields');
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError('Passwords do not match');
+          return;
+        }
+        if (password.length < 6) {
+          setError('Password must be at least 6 characters');
+          return;
+        }
+      }
+    } else {
+      // Login validation
+      if (!email || !password) {
+        setError('Please fill in all fields');
+        return;
+      }
+    }
+
     setLoading(true);
-
-    // Validation
-    if (!email || !password) {
-      setError('Please fill in all fields');
-      setLoading(false);
-      return;
-    }
-
-    if (isSignUp && password !== confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
 
     if (isSignUp && password.length < 6) {
       setError('Password must be at least 6 characters long');
@@ -104,14 +183,27 @@ export default function Login() {
     setError('');
     setPassword('');
     setConfirmPassword('');
+    setSignUpStep(1);
+    setEmailAvailable(null);
+  };
+
+  const goBackToStep1 = () => {
+    setSignUpStep(1);
+    setError('');
+    setPassword('');
+    setConfirmPassword('');
   };
 
   // Optional small shimmer while redirecting
   if (redirecting) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
+      <div 
+        className="min-h-screen flex flex-col items-center justify-center bg-background"
+      >
         <div className="relative">
-          <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-purple-600 animate-pulse shadow-xl" />
+          <div 
+            className="h-16 w-16 rounded-2xl animate-pulse shadow-xl bg-accent"
+          />
           <div className="absolute inset-0 flex items-center justify-center">
             <svg className="h-8 w-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <circle className="opacity-30" cx="12" cy="12" r="10" strokeWidth="4" />
@@ -119,31 +211,41 @@ export default function Login() {
             </svg>
           </div>
         </div>
-        <p className="mt-8 text-gray-600 dark:text-gray-300 font-medium tracking-wide">
+        <p 
+          className="mt-8 font-medium tracking-wide text-secondary"
+        >
           Redirecting to your dashboard...
         </p>
       </div>
     );
   }
 
-  // Decide animation sources (using stable public Lottie URLs from existing util)
-  const animationSrc = isSignUp ? educationAnimations.graduation : educationAnimations.reading;
-  const altAnimationSrc = isSignUp ? educationAnimations.online_learning : educationAnimations.education;
+  // Decide animation sources
+  const animationSrc = educationAnimations.reading;
+  const newSignupAnimation = "https://lottie.host/c5fcb778-fcaf-4cb3-8430-a5926f6ae649/KhQb6JkJUg.lottie";
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 pt-16">
+      <div 
+        className="min-h-screen pt-16 bg-background"
+      >
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center relative">
-              {/* Animation / Info Column (position swaps when toggling) */}
-              <div className={`space-y-8 transition-all duration-500 ${isSignUp ? 'lg:order-2' : 'lg:order-1'} ${isSignUp ? 'animate-slide-fade' : 'animate-fade-in'}`}> 
+            <div className="grid lg:grid-cols-2 gap-12 items-center relative overflow-hidden">
+              {/* Animation / Info Column */}
+              <div className={`space-y-8 transition-all duration-700 ease-in-out transform ${
+                isSignUp 
+                  ? 'lg:order-2 lg:translate-x-0' 
+                  : 'lg:order-1 lg:translate-x-0'
+              }`}> 
                 <div className="text-center lg:text-left">
-                  <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                  <h1 
+                    className="text-3xl lg:text-4xl font-bold mb-4 text-text"
+                  >
                     {isSignUp ? 'Join BiLearnHub' : 'Welcome Back'}
                   </h1>
-                  <p className="text-lg text-gray-600 dark:text-gray-400">
+                  <p className="text-lg text-secondary">
                     {isSignUp 
                       ? 'Create your account and start your learning journey today'
                       : 'Sign in to continue your learning journey'
@@ -153,106 +255,229 @@ export default function Login() {
 
                 <div className="flex justify-center">
                   <div className="relative group">
-                    <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
-                    {/* Primary animation with manual fallback wrapper */}
+                    <div className="absolute -inset-4 rounded-3xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity bg-accent" style={{ opacity: 0.1 }} />
+                    {/* Animation - Different for signup vs login */}
                     <div className="rounded-3xl overflow-hidden">
-                      <LottiePlayer
-                        key={isSignUp ? 'signup-anim' : 'login-anim'}
-                        src={animationSrc}
-                        style={{ height: '380px', width: '380px' }}
-                        className="drop-shadow-xl"
-                      />
+                      {isSignUp ? (
+                        <DotLottiePlayer
+                          key="signup-anim"
+                          src={newSignupAnimation}
+                          style={{ height: '450px', width: '450px' }}
+                          className="drop-shadow-xl"
+                          loop={true}
+                          autoplay={true}
+                        />
+                      ) : (
+                        <LottiePlayer
+                          key="login-anim"
+                          src={animationSrc}
+                          style={{ height: '320px', width: '320px' }}
+                          className="drop-shadow-xl"
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <div className="hidden lg:block text-center space-y-4">
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-secondary">
                     Join thousands of learners worldwide
                   </p>
                   <div className="flex justify-center space-x-8 text-sm">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">Free</div>
-                      <div className="text-gray-500">Forever</div>
+                      <div 
+                        className="text-2xl font-bold text-accent"
+                      >
+                        Free
+                      </div>
+                      <div className="text-secondary">Forever</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">Open</div>
-                      <div className="text-gray-500">Source</div>
+                      <div 
+                        className="text-2xl font-bold text-accent"
+                      >
+                        Open
+                      </div>
+                      <div className="text-secondary">Source</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">Community</div>
-                      <div className="text-gray-500">Driven</div>
+                      <div 
+                        className="text-2xl font-bold text-accent"
+                      >
+                        Community
+                      </div>
+                      <div className="text-secondary">Driven</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Auth Form Column (position swaps) */}
-              <div className={`max-w-md mx-auto w-full transition-all duration-500 ${isSignUp ? 'lg:order-1' : 'lg:order-2'} ${isSignUp ? 'animate-fade-in' : 'animate-slide-fade'}`}> 
-                <div className="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.25)] p-8 border border-gray-200/60 dark:border-gray-700/60 overflow-hidden transition-all duration-500">
-                  <div className="pointer-events-none absolute -top-32 -right-24 h-64 w-64 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl" />
-                  <div className="pointer-events-none absolute -bottom-32 -left-24 h-64 w-64 bg-gradient-to-tr from-purple-500/10 to-blue-600/10 rounded-full blur-3xl" />
+              {/* Auth Form Column */}
+              <div className={`max-w-md mx-auto w-full transition-all duration-700 ease-in-out transform ${
+                isSignUp 
+                  ? 'lg:order-1 lg:translate-x-0' 
+                  : 'lg:order-2 lg:translate-x-0'
+              }`}> 
+                <div 
+                  className="relative backdrop-blur-xl rounded-3xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.25)] p-8 border overflow-hidden transition-all duration-500 bg-primary border-secondary"
+                  style={{
+                    opacity: '0.95'
+                  }}
+                >
+                  <div className="pointer-events-none absolute -top-32 -right-24 h-64 w-64 rounded-full blur-3xl bg-accent" style={{ opacity: '0.1' }} />
+                  <div className="pointer-events-none absolute -bottom-32 -left-24 h-64 w-64 rounded-full blur-3xl bg-primary" style={{ opacity: '0.1' }} />
                   <div className="text-center mb-8">
                     <div className="h-10 relative">
-                      <h2 key={isSignUp ? 'create' : 'signin'} className="text-2xl font-bold text-gray-900 dark:text-white absolute inset-0 flex items-center justify-center animate-fade-in">
-                        {isSignUp ? 'Create Account' : 'Sign In'}
+                      <h2 
+                        key={isSignUp ? (signUpStep === 1 ? 'email-step' : 'password-step') : 'signin'} 
+                        className="text-2xl font-bold absolute inset-0 flex items-center justify-center animate-fade-in text-text"
+                      >
+                        {isSignUp 
+                          ? signUpStep === 1 
+                            ? 'Create Account' 
+                            : 'Set Password'
+                          : 'Sign In'
+                        }
                       </h2>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 mt-2">
-                      {isSignUp ? 'Join the BiLearnHub community' : 'Access your learning dashboard'}
+                    <p 
+                      className="mt-2 text-secondary"
+                    >
+                      {isSignUp 
+                        ? signUpStep === 1 
+                          ? 'Enter your email to get started'
+                          : 'Choose a secure password'
+                        : 'Access your learning dashboard'
+                      }
                     </p>
+                    {isSignUp && (
+                      <div className="flex justify-center mt-4">
+                        <div className="flex space-x-2">
+                          <div className={`h-2 w-8 rounded-full transition-colors ${signUpStep === 1 ? 'bg-accent' : 'bg-secondary/30'}`} />
+                          <div className={`h-2 w-8 rounded-full transition-colors ${signUpStep === 2 ? 'bg-accent' : 'bg-secondary/30'}`} />
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <style jsx global>{`
                     .animate-fade-in {animation: fade-in .4s ease;}
                     .animate-slide-fade {animation: slide-fade .45s ease;}
+                    .form-slide-enter {animation: slide-in-right .6s ease;}
+                    .form-slide-exit {animation: slide-out-left .6s ease;}
                     @keyframes fade-in {from {opacity:0; transform:translateY(4px);} to {opacity:1; transform:translateY(0);} }
                     @keyframes slide-fade {from {opacity:0; transform:translateY(12px);} to {opacity:1; transform:translateY(0);} }
+                    @keyframes slide-in-right {from {opacity:0; transform:translateX(30px);} to {opacity:1; transform:translateX(0);} }
+                    @keyframes slide-out-left {from {opacity:1; transform:translateX(0);} to {opacity:0; transform:translateX(-30px);} }
                   `}</style>
 
-                  {/* Email/Password Form */}
+                  {/* Dynamic Form Content */}
                   <form onSubmit={handleEmailAuth} className="space-y-6 animate-slide-fade">
-                    <Input
-                      type="email"
-                      label="Email Address"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                      required
-                    />
-
-                    <Input
-                      type="password"
-                      label="Password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                      showPasswordToggle
-                      required
-                    />
-
-                    <div className="relative">
-                      {isSignUp && (
-                        <div key="confirm" className="animate-slide-fade">
+                    {/* Email Step (Login or Signup Step 1) */}
+                    {(!isSignUp || signUpStep === 1) && (
+                      <div className="space-y-4">
+                        <div className="relative">
+                          <Input
+                            type="email"
+                            label="Email Address"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                            required
+                          />
+                          {isSignUp && email && (
+                            <div className="mt-2 flex items-center text-sm">
+                              {emailChecking ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></div>
+                                  <span className="text-secondary">Checking availability...</span>
+                                </>
+                              ) : emailAvailable === true ? (
+                                <>
+                                  <svg className="h-4 w-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-green-500">Email available</span>
+                                </>
+                              ) : emailAvailable === false ? (
+                                <>
+                                  <svg className="h-4 w-4 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-red-500">Email already taken</span>
+                                </>
+                              ) : null}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {!isSignUp && (
                           <Input
                             type="password"
-                            label="Confirm Password"
-                            placeholder="Confirm your password"
-                            value={confirmPassword}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                            label="Password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                             showPasswordToggle
                             required
                           />
+                        )}
+                      </div>
+                    )}
+
+                    {/* Password Step (Signup Step 2) */}
+                    {isSignUp && signUpStep === 2 && (
+                      <div className="space-y-4">
+                        <div className="flex items-center mb-4">
+                          <button
+                            type="button"
+                            onClick={goBackToStep1}
+                            className="flex items-center text-accent hover:text-accent/80 transition-colors"
+                          >
+                            <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                            Back to email
+                          </button>
+                          <div className="ml-4 text-sm text-secondary">
+                            {email}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                        
+                        <Input
+                          type="password"
+                          label="Password"
+                          placeholder="Choose a password"
+                          value={password}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                          showPasswordToggle
+                          required
+                        />
+                        
+                        <Input
+                          type="password"
+                          label="Confirm Password"
+                          placeholder="Confirm your password"
+                          value={confirmPassword}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                          showPasswordToggle
+                          required
+                        />
+                      </div>
+                    )}
 
                     {error && (
-                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                      <div 
+                        className="border rounded-lg p-4"
+                        style={{
+                          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                          borderColor: 'rgba(239, 68, 68, 0.3)'
+                        }}
+                      >
                         <div className="flex">
                           <svg className="h-5 w-5 text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                           </svg>
-                          <p className="ml-3 text-sm text-red-700 dark:text-red-400">{error}</p>
+                          <p className="ml-3 text-sm text-red-700">{error}</p>
                         </div>
                       </div>
                     )}
@@ -260,12 +485,17 @@ export default function Login() {
                     <div className="space-y-4 pt-2">
                       <Button
                         type="submit"
-                        variant="gradient"
+                        variant="accent"
                         size="lg"
                         loading={loading}
                         className="w-full"
                       >
-                        {isSignUp ? 'Create Account' : 'Sign In'}
+                        {isSignUp 
+                          ? signUpStep === 1 
+                            ? 'Continue' 
+                            : 'Create Account'
+                          : 'Sign In'
+                        }
                       </Button>
                     </div>
                   </form>
@@ -274,10 +504,16 @@ export default function Login() {
                   <div className="mt-8">
                     <div className="relative mb-6">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+                        <div 
+                          className="w-full border-t border-secondary"
+                        />
                       </div>
                       <div className="relative flex justify-center text-xs tracking-wide uppercase font-medium">
-                        <span className="px-3 py-1 rounded-full bg-white/70 dark:bg-gray-800/70 backdrop-blur text-gray-500">Or continue with</span>
+                        <span 
+                          className="px-3 py-1 rounded-full backdrop-blur bg-primary text-secondary"
+                        >
+                          Or continue with
+                        </span>
                       </div>
                     </div>
                     <Button
@@ -302,7 +538,7 @@ export default function Login() {
                   <div className="mt-6 text-center">
                     <button
                       onClick={toggleMode}
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors relative after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-gradient-to-r from-blue-500 to-purple-500 hover:after:w-full after:transition-all"
+                      className="font-medium transition-colors relative after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 hover:after:w-full after:transition-all text-accent after:bg-accent"
                     >
                       {isSignUp 
                         ? 'Already have an account? Sign in' 

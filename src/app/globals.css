@@ -1,29 +1,29 @@
 @import "tailwindcss";
 
-/* CSS Variables for theme support */
-:root {
+/* CSS Variables for consistent theme support */
+:root[data-theme="light"] {
+  --text: #040316;
   --background: #ffffff;
-  --foreground: #171717;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --secondary: #64748b;
-  --accent: #8b5cf6;
-  --border: #e2e8f0;
-  --input: #f8fafc;
-  --ring: #2563eb;
-  --radius: 0.5rem;
+  --primary: #373643;
+  --secondary: #64636d;
+  --accent: #00c389;
 }
 
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --secondary: #64748b;
-  --accent: #a78bfa;
-  --border: #334155;
-  --input: #1e293b;
-  --ring: #3b82f6;
+:root[data-theme="dark"] {
+  --text: #f5f5f5;
+  --background: #373643;
+  --primary: #ffffff;
+  --secondary: #a0a0a0;
+  --accent: #00c389;
+}
+
+/* Fallback for when data-theme is not set - defaults to light */
+:root {
+  --text: #040316;
+  --background: #ffffff;
+  --primary: #373643;
+  --secondary: #64636d;
+  --accent: #00c389;
 }
 
 /* Base styles */
@@ -36,12 +36,13 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--background);
+  color: var(--text);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Scrollbar customization */
@@ -54,12 +55,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--secondary);
   border-radius: 3px;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 /* Focus styles */
@@ -112,25 +113,21 @@ body {
   }
 }
 
-/* Gradient text utility */
+/* Gradient text utility using theme colors */
 .gradient-text {
-  background: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glass effect utility */
+/* Glass effect utility using theme variables */
 .glass {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.dark .glass {
-  background: rgba(17, 24, 39, 0.8);
-  border: 1px solid rgba(75, 85, 99, 0.2);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  opacity: 0.95;
 }
 
 /* Custom button hover effects */
@@ -140,19 +137,15 @@ body {
 
 .btn-hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 195, 137, 0.15);
 }
 
-.dark .btn-hover-lift:hover {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-}
-
-/* Loading spinner */
+/* Loading spinner using theme colors */
 .spinner {
   width: 20px;
   height: 20px;
   border: 2px solid transparent;
-  border-top: 2px solid currentColor;
+  border-top: 2px solid var(--accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -163,14 +156,10 @@ body {
   }
 }
 
-/* Custom selection */
+/* Custom selection using theme colors */
 ::selection {
-  background: rgba(37, 99, 235, 0.3);
-  color: inherit;
-}
-
-.dark ::selection {
-  background: rgba(59, 130, 246, 0.3);
+  background-color: rgba(0, 195, 137, 0.3);
+  color: var(--text);
 }
 
 /* Print styles */
@@ -178,4 +167,161 @@ body {
   .no-print {
     display: none !important;
   }
+}
+
+/* Additional utility classes for consistent theming */
+.text-theme {
+  color: var(--text);
+}
+
+.bg-theme {
+  background-color: var(--background);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.bg-card {
+  background-color: var(--card-bg);
+}
+
+.border-theme {
+  border-color: var(--border);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.text-secondary {
+  color: var(--secondary);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+/* Hover utilities */
+.hover-accent:hover {
+  color: var(--accent);
+}
+
+.hover-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.hover-accent-bg:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Focus utilities */
+.focus-accent:focus {
+  outline-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Card component utility */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+
+/* Input component utility */
+.input {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 195, 137, 0.2);
+}
+
+/* Button component utilities */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--background);
+  border: 1px solid var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  color: white;
+  border: 1px solid var(--accent);
+}
+
+.btn-accent:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+
+.btn-outline:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--secondary);
+  border: 1px solid transparent;
+}
+
+.btn-ghost:hover {
+  background-color: var(--border);
+  color: var(--text);
+}
+
+/* Navbar glassmorphism effect */
+.navbar-glass {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .navbar-glass {
+  background-color: rgba(66, 65, 78, 0.8);
+}
+
+/* Loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, var(--input-bg) 25%, var(--border) 50%, var(--input-bg) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
