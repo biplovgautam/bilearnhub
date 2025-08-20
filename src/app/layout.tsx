@@ -18,6 +18,14 @@ export const metadata: Metadata = {
   description: "An open-source LMS where anyone can learn or teach. Join our community of learners and educators.",
   keywords: "LMS, Learning Management System, Education, Open Source, Online Learning",
   authors: [{ name: "Biplov Gautam" }],
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/logo.jpg', type: 'image/jpeg' }
+    ],
+    apple: '/logo.jpg',
+    shortcut: '/favicon.ico',
+  },
   openGraph: {
     title: "BiLearnHub - Open Source Learning Management System",
     description: "An open-source LMS where anyone can learn or teach",

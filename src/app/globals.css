@@ -1,15 +1,7 @@
 @import "tailwindcss";
 
-/* CSS Variables for consistent theme support */
-:root[data-theme="light"] {
-  --text: #040316;
-  --background: #ffffff;
-  --primary: #373643;
-  --secondary: #64636d;
-  --accent: #00c389;
-}
-
-:root[data-theme="dark"] {
+/* CSS Variables for dark mode theme */
+:root {
   --text: #f5f5f5;
   --background: #373643;
   --primary: #ffffff;
@@ -17,12 +9,12 @@
   --accent: #00c389;
 }
 
-/* Fallback for when data-theme is not set - defaults to light */
-:root {
-  --text: #040316;
-  --background: #ffffff;
-  --primary: #373643;
-  --secondary: #64636d;
+/* Keep data-theme for compatibility */
+:root[data-theme="dark"] {
+  --text: #f5f5f5;
+  --background: #373643;
+  --primary: #ffffff;
+  --secondary: #a0a0a0;
   --accent: #00c389;
 }
 

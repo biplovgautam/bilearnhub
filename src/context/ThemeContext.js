@@ -13,38 +13,21 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState('light');
+  const [theme] = useState('dark'); // Always dark mode
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Get theme from localStorage or default to system preference
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else if (prefersDark) {
-      setTheme('dark');
-    }
-    
     setMounted(true);
   }, []);
 
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem('theme', theme);
-      
-      // Update data-theme attribute on document root
-      document.documentElement.setAttribute('data-theme', theme);
-      
-      // Remove old class-based theme system
-      document.documentElement.classList.remove('dark', 'light');
+      // Always set dark theme
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
     }
-  }, [theme, mounted]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
+  }, [mounted]);
 
   // Prevent hydration mismatch
   if (!mounted) {
@@ -52,7 +35,7 @@ export const ThemeProvider = ({ children }) => {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isDark: theme === 'dark' }}>
+    <ThemeContext.Provider value={{ theme, isDark: true }}>
       {children}
     </ThemeContext.Provider>
   );
