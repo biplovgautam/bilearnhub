@@ -288,13 +288,13 @@ body {
 
 /* Navbar glassmorphism effect */
 .navbar-glass {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(19, 26, 35, 0.9);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
 }
 
 [data-theme="dark"] .navbar-glass {
-  background-color: rgba(66, 65, 78, 0.8);
+  background-color: rgba(19, 26, 35, 0.9);
 }
 
 /* Loading states */

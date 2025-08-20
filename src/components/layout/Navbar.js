@@ -12,7 +12,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               {/* Navbar Logo */}
-              <div className="relative h-10 w-10 mr-3">
+              <div className="relative h-16 w-28 mr-3">
                 <Image 
                   src="/navlogo.jpg" 
                   alt="BiLearnHub" 

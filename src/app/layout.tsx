@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BiLearnHub - Open Source Learning Management System",
-  description: "An open-source LMS where anyone can learn or teach. Join our community of learners and educators.",
-  keywords: "LMS, Learning Management System, Education, Open Source, Online Learning",
+  title: "BiLearnHub - Open Learning Platform",
+  description: "An open-learning platform where anyone can learn or teach. Join our community of learners and educators.",
+  keywords: "LMS, Learning Management System, Education, Open Source, Online Learning, open-learning platform",
   authors: [{ name: "Biplov Gautam" }],
   icons: {
     icon: [
